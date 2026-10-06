@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VozMiga - Hub OSINT & Generador QR</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 20px; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 30px; padding: 20px 0; }
+    h1 { font-size: 1.8rem; color: #38bdf8; margin-bottom: 8px; }
+    p { color: #94a3b8; font-size: 0.95rem; }
+    .search-box { width: 100%; padding: 14px 20px; font-size: 1rem; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #fff; margin-bottom: 25px; outline: none; }
+    .search-box:focus { border-color: #38bdf8; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 40px; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; }
+    .tag { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 3px 8px; background: #0284c7; color: #fff; border-radius: 4px; margin-bottom: 10px; width: fit-content; }
+    .card h3 { font-size: 1.1rem; margin-bottom: 6px; }
+    .card p { font-size: 0.85rem; line-height: 1.4; margin-bottom: 15px; }
+    .btn { display: inline-block; text-align: center; background: #38bdf8; color: #0f172a; font-weight: 600; text-decoration: none; padding: 9px 14px; border-radius: 6px; font-size: 0.85rem; border: none; cursor: pointer; }
+    .btn:hover { background: #7dd3fc; }
+    .qr-section { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 25px; text-align: center; }
+    .qr-inputs { display: flex; gap: 10px; max-width: 500px; margin: 20px auto; flex-wrap: wrap; }
+    .qr-inputs input { flex: 1; min-width: 200px; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #fff; }
+    #qr-result { margin-top: 15px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Hub OSINT & Generador de QR</h1>
+    <p>Acceso rápido a utilidades de investigación, auditoría web y reputación.</p>
+  </header>
+
+  <input type="text" id="searchInput" class="search-box" placeholder="Buscar herramienta (ej: imágenes, IP, reputación)..." onkeyup="filterTools()">
+
+  <div class="grid" id="toolsGrid">
+    <div class="card">
+      <div><span class="tag">Imágenes</span><h3>Yandex Images</h3><p>Búsqueda inversa visual avanzada para reconocer fotos o caras.</p></div>
+      <a href="https://yandex.com/images/" target="_blank" class="btn">Abrir Yandex ↗️</a>
+    </div>
+    <div class="card">
+      <div><span class="tag">Imágenes</span><h3>TinEye</h3><p>Motor de búsqueda inversa especializado en seguimiento de marcas.</p></div>
+      <a href="https://tineye.com/" target="_blank" class="btn">Abrir TinEye ↗️</a>
+    </div>
+    <div class="card">
+      <div><span class="tag">Infraestructura</span><h3>Shodan</h3><p>Buscador de dispositivos e infraestructura conectada a Internet.</p></div>
+      <a href="https://www.shodan.io/" target="_blank" class="btn">Abrir Shodan ↗️</a>
+    </div>
+    <div class="card">
+      <div><span class="tag">Infraestructura</span><h3>Censys</h3><p>Análisis de servidores, certificados SSL y dominios.</p></div>
+      <a href="https://censys.io/" target="_blank" class="btn">Abrir Censys ↗️</a>
+    </div>
+    <div class="card">
+      <div><span class="tag">Menciones</span><h3>Social Searcher</h3><p>Monitoreo en tiempo real de menciones en redes sociales.</p></div>
+      <a href="https://www.social-searcher.com/" target="_blank" class="btn">Abrir Social Searcher ↗️</a>
+    </div>
+    <div class="card">
+      <div><span class="tag">Reputación</span><h3>ScamAdviser</h3><p>Comprueba la confiabilidad y reputación de cualquier sitio web.</p></div>
+      <a href="https://www.scamadviser.com/" target="_blank" class="btn">Abrir ScamAdviser ↗️</a>
+    </div>
+  </div>
+
+  <div class="qr-section">
+    <h2>Generador Rápido de Código QR</h2>
+    <p>Ingresa un enlace para generar un QR listo para descargar.</p>
+    <div class="qr-inputs">
+      <input type="text" id="qrText" placeholder="https://tu-sitio-web.com">
+      <button onclick="generateQR()" class="btn">Generar QR</button>
+    </div>
+    <div id="qr-result"></div>
+  </div>
+</div>
+
+<script>
+  function filterTools() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const cards = document.getElementsByClassName('card');
+    for (let i = 0; i < cards.length; i++) {
+      cards[i].style.display = cards[i].innerText.toLowerCase().includes(input) ? "flex" : "none";
+    }
+  }
+  function generateQR() {
+    const text = document.getElementById('qrText').value;
+    const res = document.getElementById('qr-result');
+    if (!text.trim()) return res.innerHTML = "<p style='color:#ef4444;'>Ingresa un enlace válido.</p>";
+    const url = https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(text)};
+    res.innerHTML = <br><img src="${url}" style="border: 2px solid #38bdf8; padding: 8px; background: #fff; border-radius: 8px;" /><br><br><a href="${url}" download="qr.png" class="btn" target="_blank">Descargar QR</a>;
+  }
+</script>
+
+</body>
+</html>
